@@ -18,6 +18,7 @@ import com.tondi.airinfoserver.AirlyConnector;
 
 @RestController
 @EnableAutoConfiguration
+@CrossOrigin(origins = "http://localhost", maxAge = 3600)
 //@ComponentScan(basePackages = "com.tondi")
 public class AirInfoController {
 //	@Autowired
@@ -26,8 +27,8 @@ public class AirInfoController {
 	private AirlyConnector airlyConnector = new AirlyConnector();
 	HashMap<String, String> locations = new HashMap<String, String>();
 	
-    @RequestMapping(value = "/data", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    String data() {
+    @RequestMapping(value = "/current", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    String current() {
 //    	String result = airlyConnector.get("/measurements/nearest?lat=50.062006&lng=19.940984");
     	
 ////    	ResponseModel rs = new ResponseModel();

@@ -45,47 +45,61 @@ public class AirlyConnector {
 	public CurrentStatusModel getCurrentPollutionForLatLng(Double lat, Double lng) {
 		final String url = "/measurements/nearest?lat=" + lat.toString() + "&" + "lng=" + lng.toString();
 		final String responseBody = this.get(url);
-		JsonNode responseNode;
-		Double pm10value = 0.0; // TODO check if its good for flow control
-		Double pm25value = 0.0;
-		
+		return this.buildCurrentStatusModel(responseBody);
+	}
+	
+	private CurrentStatusModel buildCurrentStatusModel(String response) {
+		final ParticlePollutionModel pm10status = new ParticlePollutionModel();
+		final ParticlePollutionModel pm25status = new ParticlePollutionModel();
+		final JsonNode responseNode;
+
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			responseNode = mapper.readTree(responseBody);
+			responseNode = mapper.readTree(response);
 		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return new CurrentStatusModel(); // TODO return EmptyCurrentStatusModel
+			return new CurrentStatusModel();
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return new CurrentStatusModel();
 		}
 		
-		Iterator<JsonNode> i = responseNode.get("current").get("values").elements();
-		
-		while(i.hasNext()) {
-			JsonNode currentValue = i.next();
+		Iterator<JsonNode> valuesIterator = responseNode.get("current").get("values").elements();
+		while(valuesIterator.hasNext()) {
+			JsonNode currentValue = valuesIterator.next();
 			if(currentValue.get("name").asText().equals("PM10")) {
-				pm10value = currentValue.get("value").asDouble();
-				break;
+				pm10status.setValue(currentValue.get("value").asDouble());
+				continue;
 			}
 			if(currentValue.get("name").asText().equals("PM25")) {
-				pm25value = currentValue.get("value").asDouble();
-				break;
+				pm25status.setValue(currentValue.get("value").asDouble());
+				continue;
 			}
 		}
 		
-		ParticlePollutionModel pm10model = new ParticlePollutionModel(pm10value, 22.2);
-		ParticlePollutionModel pm25model = new ParticlePollutionModel(pm25value, 22.2);
+		Iterator<JsonNode> standardsIterator = responseNode.get("current").get("standards").elements();
+		
+		while(standardsIterator.hasNext()) {
+			JsonNode currentValue = standardsIterator.next();
+			if(currentValue.get("pollutant").asText().equals("PM10")) {
+				pm10status.setPercentage(currentValue.get("percent").asDouble());
+				continue;
+			}
+			if(currentValue.get("pollutant").asText().equals("PM25")) {
+				pm25status.setPercentage(currentValue.get("percent").asDouble());
+				continue;
+			}
+		}
+		
 		CurrentStatusModel status = new CurrentStatusModel();
-		status.setPM10Model(pm10model);
-		status.setPM25Model(pm25model);
-		
-		
-//	  mapper.readValue("{\"name\": \"John\"}", Person.class);
+		status.setPM10(pm10status);
+		status.setPM25(pm25status);
 
-		return status;
+		if(pm10status.getPercentage() > 100 || pm25status.getPercentage() > 100) {
+			status.setMatchesNorms(false);
+		}
+
+		return status;	
 	}
 
 	public HttpStatus getStatus() {

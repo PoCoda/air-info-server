@@ -4,31 +4,31 @@ import com.tondi.airinfoserver.model.status.PM.ParticlePollutionModel;
 
 public class CurrentStatusModel {
 
-	private ParticlePollutionModel pm10model;
-	private ParticlePollutionModel pm25model;
-	boolean matches = true;
+	private ParticlePollutionModel pm10;
+	private ParticlePollutionModel pm25;
+	boolean matchesNorms = true;
 
 	public void setMatchesNorms(boolean value) {
-		this.matches = value;
+		this.matchesNorms = value;
 	}
 	
-	public void setPM10Model(ParticlePollutionModel model) {
-		this.pm10model = model;
+	public void setPM10(ParticlePollutionModel pm10) {
+		this.pm10 = pm10;
 	}
 	
-	public void setPM25Model(ParticlePollutionModel model) {
-		this.pm25model = model;
+	public void setPM25(ParticlePollutionModel pm25) {
+		this.pm25 = pm25;
 	}
 	
 	public boolean getMatchesNorms() {
-		return matches;
+		return matchesNorms;
 	}
 
-	public ParticlePollutionModel getPm10model() {
-		return pm10model;
+	public ParticlePollutionModel getPm10() {
+		return pm10;
 	}
 
-	public ParticlePollutionModel getPm25model() {
-		return pm25model;
+	public ParticlePollutionModel getPm25() {
+		return pm25;
 	}
 }
