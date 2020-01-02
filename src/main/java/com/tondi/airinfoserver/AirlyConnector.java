@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tondi.airinfoserver.model.status.CurrentStatusModel;
 import com.tondi.airinfoserver.model.status.PM.ParticlePollutionModel;
 
-//@Service
+@Service
 public class AirlyConnector {
 	private String server = "https://airapi.airly.eu/v2";
 	private RestTemplate rest;
@@ -43,7 +43,7 @@ public class AirlyConnector {
 	}
 
 	public CurrentStatusModel getCurrentPollutionForLatLng(Double lat, Double lng) {
-		final String url = "/measurements/nearest?lat=" + lat.toString() + "&" + "lng=" + lng.toString();
+		final String url = "/measurements/point?lat=" + lat.toString() + "&" + "lng=" + lng.toString();
 		final String responseBody = this.get(url);
 		return this.buildCurrentStatusModel(responseBody);
 	}
