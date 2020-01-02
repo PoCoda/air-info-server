@@ -30,8 +30,7 @@ public class AirInfoController {
 	
     @RequestMapping(value = "/current", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     String current() {
-    	CurrentStatusModel result = airlyConnector.getCurrentPollutionForLatLng(District.Stare_Miasto.getLat(), District.Stare_Miasto.getLng());	
-         
+    	CurrentStatusModel result = airlyConnector.getCurrentPollutionForLatLng(District.Old_Town.getLat(), District.Old_Town.getLng());
 
         try { 
             String jsonStr = mapper.writeValueAsString(result); 
@@ -44,18 +43,36 @@ public class AirInfoController {
     
     @RequestMapping(value = "/streak", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     String streak() {
-    	CurrentStatusModel result = airlyConnector.getCurrentPollutionForLatLng(50.062006, 19.940984);	
-    	
-        ObjectMapper mapper = new ObjectMapper(); 
-
-        try { 
-            String jsonStr = mapper.writeValueAsString(result); 
-            return jsonStr;
-        } catch (IOException e) { 
-            e.printStackTrace(); 
-            return null;
-        } 
+//    	CurrentStatusModel result = airlyConnector.getCurrentPollutionForLatLng(50.062006, 19.940984);	
+//        try { 
+//            String jsonStr = mapper.writeValueAsString(result); 
+//            return jsonStr;
+//        } catch (IOException e) { 
+//            e.printStackTrace(); 
+//            return null;
+//        }
+    	return null;
     }
+    
+//    @RequestMapping(value = "/best-worst-since", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//    String bestWorstSince() {
+//    	return null;
+//    }
+//    
+//    @RequestMapping(value = "/worst-district", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//    String worstDistrict() {
+//    	return null;
+//    }
+//
+//    @RequestMapping(value = "/last-week-average", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//    String lastWeekAverage() {
+//    	return null;
+//    }
+//    
+//    @RequestMapping(value = "/last-year", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//    String lastYear() {
+//    	return null;
+//    }
 
     public static void main(String[] args) {    	
         SpringApplication.run(AirInfoController.class, args);

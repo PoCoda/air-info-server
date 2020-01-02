@@ -1,7 +1,7 @@
 package com.tondi.airinfoserver;
 
 public enum District {
-	Stare_Miasto(50.066583, 19.940139),
+	Old_Town(50.066583, 19.940139),
 	Grzegorzki(0.0, 0.0),
 	Pradnik_Czerwony(0.0, 0.0),
 	Pradnik_Bialy(0.0, 0.0),
