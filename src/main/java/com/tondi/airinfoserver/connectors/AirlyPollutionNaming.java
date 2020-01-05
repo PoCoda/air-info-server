@@ -4,23 +4,19 @@ public enum AirlyPollutionNaming {
 	PM10("PM10"), 
 	PM25("PM25");
 
-	private String name;
+	private String valueName;
 
 	AirlyPollutionNaming(String name) {
-		this.name = name;
+		this.valueName = name;
 	}
 	
 	public String getName() {
-        return name;
-    }
-	
-    public String toString(){ // TODO
-        return name;
+        return valueName;
     }
 
-    public static String getEnumByString(String code){
+    public static String getEnumKey(String code){
         for(AirlyPollutionNaming e : AirlyPollutionNaming.values()){
-            if(code == e.name) return e.name();
+            if(code == e.name()) return e.getName();
         }
         return null;
     }

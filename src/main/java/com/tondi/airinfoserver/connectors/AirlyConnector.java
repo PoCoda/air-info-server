@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tondi.airinfoserver.model.status.StatusModel;
-import com.tondi.airinfoserver.model.status.PM.ParticlePollutionModel;
+import com.tondi.airinfoserver.model.status.PM.PollutionModel;
 
 @Service
 public class AirlyConnector implements PollutionServiceConnector {
@@ -54,8 +54,8 @@ public class AirlyConnector implements PollutionServiceConnector {
 	}
 
 	private StatusModel buildCurrentStatusModel(String response) {
-		ParticlePollutionModel pm10status = new ParticlePollutionModel("PM10");
-		ParticlePollutionModel pm25status = new ParticlePollutionModel("PM25");
+		PollutionModel pm10status = new PollutionModel("PM10");
+		PollutionModel pm25status = new PollutionModel("PM25");
 		final JsonNode responseNode;
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -136,12 +136,12 @@ public class AirlyConnector implements PollutionServiceConnector {
 		
 		ArrayList<StatusModel> hourlyModels = new ArrayList<StatusModel>();
  
-		Iterator<JsonNode> dayIterator = responseNode.get("history").elements();
+		Iterator<JsonNode> dayIterator = responseNode.get("history").iterator();
 		while(dayIterator.hasNext()) {
-			Iterator<JsonNode> valuesIterator = dayIterator.next().get("values").elements();
+			Iterator<JsonNode> valuesIterator = dayIterator.next().get("values").iterator();
 			
-			ParticlePollutionModel pm10status = new ParticlePollutionModel("PM10");
-			ParticlePollutionModel pm25status = new ParticlePollutionModel("PM25");
+			PollutionModel pm10status = new PollutionModel("PM10");
+			PollutionModel pm25status = new PollutionModel("PM25");
 			
 			// TODO try to use composite pattern as history contains same values as above and reuse code
 			while (valuesIterator.hasNext()) {
@@ -162,33 +162,15 @@ public class AirlyConnector implements PollutionServiceConnector {
 			
 			hourlyModels.add(hourlyStatus);
 		}
-
 		
-		StatusModel average;
-		try {
-			average = (StatusModel) hourlyModels.get(0).clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace(); 
-			return new StatusModel();	 
-		}
-		
-		for(StatusModel model : hourlyModels) {
-			ParticlePollutionModel hourlyPm10 = model.getPm10();
-			Double newPm10Value = (average.getPm10().getValue() + hourlyPm10.getValue()) / 2; 
-			average.getPm10().setValue(newPm10Value);
-			
-			ParticlePollutionModel hourlyPm25 = model.getPm25();
-			Double newPm25Value = (average.getPm25().getValue() + hourlyPm25.getValue()) / 2;
-			average.getPm25().setValue(newPm25Value);
-		}
+//		System.out.println(getAirlyPollutionIdentifierName(hourlyModels.get(0).getPm10()));
 
-		System.out.println(average.getPm10().getValue());
-		return average;	
+		return StatusModel.getAveragedStatus(hourlyModels);
 	}
 
-	private String getAirlyPollutionIdentifierName(ParticlePollutionModel model) {
+	private String getAirlyPollutionIdentifierName(PollutionModel model) {
 		String modelName = model.getName();
-		return AirlyPollutionNaming.getEnumByString(modelName);
+		return AirlyPollutionNaming.getEnumKey(modelName);
 	}
 
 	public HttpStatus getStatus() {

@@ -10,16 +10,9 @@ import com.tondi.airinfoserver.daily_executor.DailyExecutor;
 
 @SpringBootApplication
 public class AirInfoServerApplication {
-
-//	@Autowired
-//	private static DailyExecutor de;
 	
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(AirInfoServerApplication.class, args);
-        context.getBean(DailyExecutor.class).startExecutionAt(0,0,0); // <-- here
-
-//		System.out.println(de);
-//		de.startExecutionAt(0, 0, 0);
+        context.getBean(DailyExecutor.class).startExecutionAt(0, 0, 0); // at each midnight
 	}
-
 }

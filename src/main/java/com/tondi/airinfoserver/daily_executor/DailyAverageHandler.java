@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.tondi.airinfoserver.District;
 import com.tondi.airinfoserver.connectors.AirlyConnector;
+import com.tondi.airinfoserver.model.status.StatusModel;
 
 @Service
 public class DailyAverageHandler {
@@ -17,8 +18,6 @@ public class DailyAverageHandler {
 	}
 	
 	private void fetchAveragePollution() {
-		System.out.println(airlyConnector);
-		airlyConnector.getAverageHistoricalPollutionForLatLng(District.Old_Town.getLat(), District.Old_Town.getLng());
-		System.out.println("After Execute");
+		StatusModel averagedStatus = airlyConnector.getAverageHistoricalPollutionForLatLng(District.Old_Town.getLat(), District.Old_Town.getLng());		
 	}
 }

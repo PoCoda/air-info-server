@@ -2,12 +2,12 @@ package com.tondi.airinfoserver.model.status.PM;
 
 import java.io.Serializable;
 
-public class ParticlePollutionModel implements Serializable {
+public class PollutionModel implements Serializable {
 	private String name;
 	private Double value;
 	private Double percentage;
 
-	public ParticlePollutionModel(String name) {
+	public PollutionModel(String name) {
 		this.name = name;
 	}
 	
