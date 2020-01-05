@@ -1,9 +1,9 @@
 package com.tondi.airinfoserver.model;
 
-import com.tondi.airinfoserver.model.status.CurrentStatusModel;
+import com.tondi.airinfoserver.model.status.StatusModel;
 
 public class ResponseModelBuilder {
-	private CurrentStatusModel currentStatusModel = new CurrentStatusModel();
+	private StatusModel currentStatusModel = new StatusModel();
 	
 	public void withCurrentStatus() {
 		

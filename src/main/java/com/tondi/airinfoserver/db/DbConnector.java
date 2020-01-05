@@ -23,9 +23,9 @@ public class DbConnector {
 		
 //		log.info("Creating tables");
 //
-//		jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
-//		jdbcTemplate.execute("CREATE TABLE customers(" +
-//				"id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
+		jdbcTemplate.execute("DROP TABLE day_measurements IF EXISTS");
+		jdbcTemplate.execute("CREATE TABLE day_measurements" +
+				"id SERIAL, pm10 VARCHAR(255), pm25 VARCHAR(255))");
 //
 //		// Split up the array of whole names into an array of first/last names
 //		List<String[]> splitUpNames = Arrays.asList("John Woo", "Jeff Dean", "Josh Bloch", "Josh Long").stream()
@@ -44,5 +44,5 @@ public class DbConnector {
 //				(rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
 //		).forEach(customer -> log.info(customer.toString()));
 	}
-	}
 }
+

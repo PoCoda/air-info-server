@@ -10,11 +10,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import com.tondi.airinfoserver.connectors.AirlyConnector;
 import com.tondi.airinfoserver.model.ResponseModel;
 import com.tondi.airinfoserver.model.ResponseModelBuilder;
-import com.tondi.airinfoserver.model.status.CurrentStatusModel;
+import com.tondi.airinfoserver.model.status.StatusModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tondi.airinfoserver.AirlyConnector;
 
 @RestController
 @EnableAutoConfiguration
@@ -30,7 +30,7 @@ public class AirInfoController {
 	
     @RequestMapping(value = "/current", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     String current() {
-    	CurrentStatusModel result = airlyConnector.getCurrentPollutionForLatLng(District.Old_Town.getLat(), District.Old_Town.getLng());
+    	StatusModel result = airlyConnector.getCurrentPollutionForLatLng(District.Old_Town.getLat(), District.Old_Town.getLng());
 
         try { 
             String jsonStr = mapper.writeValueAsString(result); 

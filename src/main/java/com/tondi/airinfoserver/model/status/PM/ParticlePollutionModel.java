@@ -3,13 +3,21 @@ package com.tondi.airinfoserver.model.status.PM;
 import java.io.Serializable;
 
 public class ParticlePollutionModel implements Serializable {
+	private String name;
 	private Double value;
 	private Double percentage;
 
-//	public ParticlePollutionModel(Double value, Double percentage) {
-//		this.value = value;
-//		this.percentage = percentage;
-//	}
+	public ParticlePollutionModel(String name) {
+		this.name = name;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 	
 	public Double getValue() {
 		return this.value;
