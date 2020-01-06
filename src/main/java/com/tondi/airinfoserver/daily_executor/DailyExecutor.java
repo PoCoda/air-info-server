@@ -9,12 +9,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.tondi.airinfoserver.District;
 import com.tondi.airinfoserver.connectors.AirlyConnector;
+import com.tondi.airinfoserver.db.DbConnector;
 
 @Component
 public class DailyExecutor {
@@ -34,25 +32,16 @@ public class DailyExecutor {
 	@Autowired
 	AirlyConnector airlyConnector;
 
-	private static final Logger logger = Logger.getLogger(DailyExecutor.class.getName());
-
-	static {
-		Handler handlerObj = new ConsoleHandler();
-		handlerObj.setLevel(Level.ALL);
-		logger.addHandler(handlerObj);
-		logger.setLevel(Level.ALL);
-		logger.setUseParentHandlers(false);
-	}
+	private static final Logger logger = LoggerFactory.getLogger(DailyExecutor.class);
 
 	public void startExecutionAt(int targetHour, int targetMin, int targetSec) {
 		Runnable taskWrapper = new Runnable() {
 
 			@Override
 			public void run() {
-				logger.log(Level.INFO,
-						"Executing Daily Executor at: " + "" + LocalDateTime.now() + " " + ZoneId.systemDefault());
+				logger.info("Executing Daily Executor at: " + "" + LocalDateTime.now() + " " + ZoneId.systemDefault());
 				averageHandler.execute();
-				logger.log(Level.INFO, "Execution finished");
+				logger.info("Execution finished");
 				startExecutionAt(targetHour, targetMin, targetSec);
 			}
 
@@ -86,7 +75,7 @@ public class DailyExecutor {
 		try {
 			executorService.awaitTermination(1, TimeUnit.DAYS);
 		} catch (InterruptedException ex) {
-			logger.log(Level.SEVERE, null, ex);
+			logger.error(null, ex);
 		}
 	}
 }

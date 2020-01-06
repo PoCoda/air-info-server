@@ -2,6 +2,7 @@ package com.tondi.airinfoserver.connectors;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -47,10 +48,10 @@ public class AirlyConnector implements PollutionServiceConnector {
 		return this.buildCurrentStatusModel(responseBody);
 	}
 	
-	public StatusModel getAverageHistoricalPollutionForLatLng(Double lat, Double lng) {
+	public List<StatusModel> getHistoricalPollutionForLatLng(Double lat, Double lng) {
 		final String url = "/measurements/point?lat=" + lat.toString() + "&" + "lng=" + lng.toString();
 		final String responseBody = this.get(url);
-		return this.getDailyHistoricalAveragePollutionModel(responseBody);
+		return this.getHourlyPollutionModels(responseBody);
 	}
 
 	private StatusModel buildCurrentStatusModel(String response) {
@@ -120,7 +121,7 @@ public class AirlyConnector implements PollutionServiceConnector {
 //		return model;
 //	}
 
-	public StatusModel getDailyHistoricalAveragePollutionModel(String response) {
+	public ArrayList<StatusModel> getHourlyPollutionModels(String response) {
 		final JsonNode responseNode;
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -165,7 +166,7 @@ public class AirlyConnector implements PollutionServiceConnector {
 		
 //		System.out.println(getAirlyPollutionIdentifierName(hourlyModels.get(0).getPm10()));
 
-		return StatusModel.getAveragedStatus(hourlyModels);
+		return hourlyModels;
 	}
 
 	private String getAirlyPollutionIdentifierName(PollutionModel model) {
