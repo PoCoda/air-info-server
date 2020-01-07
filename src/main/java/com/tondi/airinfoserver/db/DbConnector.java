@@ -1,7 +1,10 @@
 package com.tondi.airinfoserver.db;
 
 import java.util.List;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDate;
+import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -14,6 +17,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.tondi.airinfoserver.model.status.StatusModel;
+import com.tondi.airinfoserver.model.status.PM.PollutionModel;
 
 @Service
 public class DbConnector {
@@ -25,23 +29,25 @@ public class DbConnector {
 	public void createDailyMeasurementsTable() {
 		log.info("Creating tables");
 //		System.out.println(jdbcTemplate);
-		jdbcTemplate.execute("DROP TABLE day_measurements IF EXISTS");
-		jdbcTemplate.execute("CREATE TABLE day_measurements (" + "id SERIAL, pm10 VARCHAR(255), pm25 VARCHAR(255))");
+		jdbcTemplate.execute("DROP TABLE daily_measurements IF EXISTS");
+		jdbcTemplate.execute("CREATE TABLE daily_measurements (" + "id SERIAL, date DATE, pm10 FLOAT, pm25 FLOAT)");
 
 	}
 
 	public void addMeasurementsToDailyTable(StatusModel model) {
-		// given measurement
-		// insert to measurements
-		createDailyMeasurementsTable();
 
-//		jdbcTemplate.update("INSERT INTO day_measurements (pm10, pm25) VALUES (?, ?)", model.getPm10().getValue(), model.getPm25().getValue());
-		jdbcTemplate.update("INSERT INTO day_measurements (pm10, pm25) VALUES (?, ?)", "40", "50");
-		jdbcTemplate.update("INSERT INTO day_measurements (pm10, pm25) VALUES (?, ?)", "30", "20");
-		jdbcTemplate.update("INSERT INTO day_measurements (pm10, pm25) VALUES (?, ?)", "50", "32");
+		createDailyMeasurementsTable();
+		
+		LocalDate localNow = LocalDate.now();
+		System.out.println(localNow);
+
+//		jdbcTemplate.update("INSERT INTO daily_measurements (pm10, pm25) VALUES (?, ?)", model.getPm10().getValue(), model.getPm25().getValue());
+		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow, "40", "50");
+		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow.plusDays(1), "30", "20");
+		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow.plusDays(2), "50", "32");
 
 		
-//		jdbcTemplate.query("SELECT * FROM day_measurements", (result) -> {
+//		jdbcTemplate.query("SELECT * FROM daily_measurements", (result) -> {
 //			System.out.println(result);
 //		});
 //
@@ -63,16 +69,24 @@ public class DbConnector {
 //		).forEach(customer -> log.info(customer.toString()));
 	}
 
-	public StatusModel getAverageStatusFor(LocalDateTime dateTime) {
-		if (dateTime.isAfter(LocalDateTime.now())) {
+	public StatusModel getAverageStatusFor(LocalDate date) {
+		if (date.isAfter(LocalDate.now())) {
 			return new StatusModel(); // TODO throw?
 		}
+		
+		String sql = "SELECT * FROM daily_measurements WHERE date = ?";
 
-		jdbcTemplate.query("SELECT * FROM day_measurements", (result) -> {
-			System.out.println(result);
+		return jdbcTemplate.queryForObject(sql, new Object[]{date.toString()}, (rs, rowNum) -> {
+			StatusModel sm = new StatusModel();
+			PollutionModel pm10 = new PollutionModel("PM10");
+			pm10.setValue(rs.getDouble("pm10"));
+			PollutionModel pm25 = new PollutionModel("PM25");
+			pm25.setValue(rs.getDouble("pm25"));
+
+			sm.setPm10(pm10);
+			sm.setPm25(pm25);
+			return sm;
 		});
-
-		return new StatusModel();
 	}
 
 }

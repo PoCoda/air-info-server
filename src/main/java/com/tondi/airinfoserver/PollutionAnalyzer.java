@@ -1,5 +1,7 @@
 package com.tondi.airinfoserver;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +13,14 @@ public class PollutionAnalyzer {
 	DbConnector dbConnector;
 	
 	public int getDaysOfMatchingNormsStreak() {		
+		LocalDate today = LocalDate.now();
+		dbConnector.getAverageStatusFor(today);
 		return 1;
 	}
 	
 	public int getDaysOfExceedingNormsStreak() {
+		LocalDate today = LocalDate.now();
+		dbConnector.getAverageStatusFor(today);
 		return 4;
 	}
 }
