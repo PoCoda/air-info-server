@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tondi.airinfoserver.PollutionType;
 import com.tondi.airinfoserver.model.status.StatusModel;
 import com.tondi.airinfoserver.model.status.PM.PollutionModel;
 
@@ -55,8 +56,8 @@ public class AirlyConnector implements PollutionServiceConnector {
 	}
 
 	private StatusModel buildCurrentStatusModel(String response) {
-		PollutionModel pm10status = new PollutionModel("PM10");
-		PollutionModel pm25status = new PollutionModel("PM25");
+		PollutionModel pm10status = new PollutionModel(PollutionType.PM10);
+		PollutionModel pm25status = new PollutionModel(PollutionType.PM25);
 		final JsonNode responseNode;
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -103,9 +104,7 @@ public class AirlyConnector implements PollutionServiceConnector {
 		status.setPm10(pm10status);
 		status.setPm25(pm25status);
 
-		if (pm10status.getPercentage() > 100 || pm25status.getPercentage() > 100) {
-			status.setMatchesNorms(false);
-		}
+		status.setMatchesNorms(StatusModel.calculateMatchesNorms(status));
 
 		return status;
 	}
@@ -141,8 +140,8 @@ public class AirlyConnector implements PollutionServiceConnector {
 		while(dayIterator.hasNext()) {
 			Iterator<JsonNode> valuesIterator = dayIterator.next().get("values").iterator();
 			
-			PollutionModel pm10status = new PollutionModel("PM10");
-			PollutionModel pm25status = new PollutionModel("PM25");
+			PollutionModel pm10status = new PollutionModel(PollutionType.PM10);
+			PollutionModel pm25status = new PollutionModel(PollutionType.PM25);
 			
 			// TODO try to use composite pattern as history contains same values as above and reuse code
 			while (valuesIterator.hasNext()) {
@@ -169,9 +168,10 @@ public class AirlyConnector implements PollutionServiceConnector {
 		return hourlyModels;
 	}
 
+	// TODO use it above
 	private String getAirlyPollutionIdentifierName(PollutionModel model) {
-		String modelName = model.getName();
-		return AirlyPollutionNaming.getEnumKey(modelName);
+		PollutionType type = model.getType();
+		return AirlyPollutionNaming.getAirlyKeyForType(type);
 	}
 
 	public HttpStatus getStatus() {

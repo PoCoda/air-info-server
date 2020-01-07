@@ -20,15 +20,11 @@ public class DailyAverageHandler {
 
 	public void execute() {
 		StatusModel average = this.getDailyAveragePollution();
-		this.insertDailyAverageToDatabase(average);
+		dbConnector.addStatusToDailyTable(average);
 	}
 	
 	private StatusModel getDailyAveragePollution() {
 		List<StatusModel> hourlyModels = airlyConnector.getHistoricalPollutionForLatLng(District.Old_Town.getLat(), District.Old_Town.getLng());
 		return StatusModel.getAveragedStatus(hourlyModels);
-	}
-	
-	private void insertDailyAverageToDatabase(StatusModel average) {
-		dbConnector.addMeasurementsToDailyTable(average);
 	}
 }

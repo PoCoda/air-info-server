@@ -2,21 +2,24 @@ package com.tondi.airinfoserver.model.status.PM;
 
 import java.io.Serializable;
 
+import com.tondi.airinfoserver.PollutionNorm;
+import com.tondi.airinfoserver.PollutionType;
+
 public class PollutionModel implements Serializable {
-	private String name;
+	private PollutionType type;
 	private Double value;
 	private Double percentage;
 
-	public PollutionModel(String name) {
-		this.name = name;
+	public PollutionModel(PollutionType type) {
+		this.type = type;
 	}
 	
-	public String getName() {
-		return name;
+	public PollutionType getType() {
+		return type;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setType(PollutionType type) {
+		this.type = type;
 	}
 	
 	public Double getValue() {
@@ -33,5 +36,10 @@ public class PollutionModel implements Serializable {
 
 	public void setPercentage(Double percentage) {
 		this.percentage = percentage;
+	}
+	
+	public static Double calculatePercentage(PollutionModel pm) {
+		Double norm = PollutionNorm.getNormValueOfType(pm.getType());
+		return pm.getValue() * 100 / norm;
 	}
 }

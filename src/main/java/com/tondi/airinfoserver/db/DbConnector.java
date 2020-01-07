@@ -16,6 +16,7 @@ import org.springframework.format.datetime.DateFormatter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import com.tondi.airinfoserver.PollutionType;
 import com.tondi.airinfoserver.model.status.StatusModel;
 import com.tondi.airinfoserver.model.status.PM.PollutionModel;
 
@@ -34,7 +35,7 @@ public class DbConnector {
 
 	}
 
-	public void addMeasurementsToDailyTable(StatusModel model) {
+	public void addStatusToDailyTable(StatusModel model) {
 
 		createDailyMeasurementsTable();
 		
@@ -69,24 +70,34 @@ public class DbConnector {
 //		).forEach(customer -> log.info(customer.toString()));
 	}
 
-	public StatusModel getAverageStatusFor(LocalDate date) {
+	public StatusModel getAverageStatusFor(LocalDate date) throws IllegalArgumentException {
 		if (date.isAfter(LocalDate.now())) {
-			return new StatusModel(); // TODO throw?
+			throw new IllegalArgumentException("Historical date " + date + "cannot be in future");
 		}
 		
 		String sql = "SELECT * FROM daily_measurements WHERE date = ?";
 
-		return jdbcTemplate.queryForObject(sql, new Object[]{date.toString()}, (rs, rowNum) -> {
+		List<StatusModel> results = jdbcTemplate.query(sql, new Object[]{date.toString()}, (rs, rowNum) -> {
 			StatusModel sm = new StatusModel();
-			PollutionModel pm10 = new PollutionModel("PM10");
+			PollutionModel pm10 = new PollutionModel(PollutionType.PM10);
 			pm10.setValue(rs.getDouble("pm10"));
-			PollutionModel pm25 = new PollutionModel("PM25");
+			pm10.setPercentage(PollutionModel.calculatePercentage(pm10));
+			PollutionModel pm25 = new PollutionModel(PollutionType.PM25);
 			pm25.setValue(rs.getDouble("pm25"));
+			pm25.setPercentage(PollutionModel.calculatePercentage(pm25));
 
 			sm.setPm10(pm10);
 			sm.setPm25(pm25);
+			sm.setMatchesNorms(StatusModel.calculateMatchesNorms(sm));
+			
 			return sm;
 		});
+		
+		if(results.size() == 1) {
+			return results.get(0);
+		}
+		
+		return null;
 	}
 
 }

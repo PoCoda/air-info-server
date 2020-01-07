@@ -58,9 +58,18 @@ public class StatusModel implements Cloneable {
 			average.getPm25().setValue(newPm25Value);
 		}
 
-//		System.out.println(average.getPm10().getValue());
-
 		return average;
 
+	}
+	
+	public static Boolean calculateMatchesNorms(StatusModel status) {
+		if(status.getPm10().getPercentage() == null || status.getPm25().getPercentage() == null) {
+			throw new IllegalArgumentException("Cannot calculate percentage - Passed object has some PollutionModel's percentage set to null");
+		}
+		
+		if (status.getPm10().getPercentage() > 100 || status.getPm25().getPercentage() > 100) {
+			return false;
+		}
+		return true;
 	}
 }

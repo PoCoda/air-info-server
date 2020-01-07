@@ -1,22 +1,24 @@
 package com.tondi.airinfoserver.connectors;
 
+import com.tondi.airinfoserver.PollutionType;
+
 public enum AirlyPollutionNaming {
-	PM10("PM10"), 
-	PM25("PM25");
+	PM10(PollutionType.PM10), 
+	PM25(PollutionType.PM25);
 
-	private String valueName;
+	private PollutionType type;
 
-	AirlyPollutionNaming(String name) {
-		this.valueName = name;
+	AirlyPollutionNaming(PollutionType type) {
+		this.type = type;
 	}
 	
-	public String getName() {
-        return valueName;
+	public PollutionType getType() {
+        return type;
     }
 
-    public static String getEnumKey(String code){
+    public static String getAirlyKeyForType(PollutionType type){
         for(AirlyPollutionNaming e : AirlyPollutionNaming.values()){
-            if(code == e.name()) return e.getName();
+            if(type == e.getType()) return e.name();
         }
         return null;
     }
