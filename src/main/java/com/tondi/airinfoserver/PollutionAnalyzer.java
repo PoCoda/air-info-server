@@ -10,9 +10,7 @@ public class PollutionAnalyzer {
 	@Autowired
 	DbConnector dbConnector;
 	
-	public int getDaysOfMatchingNormsStreak() {
-		Boolean currentlyMatchesNorms = true;
-		
+	public int getDaysOfMatchingNormsStreak() {		
 		return 1;
 	}
 	

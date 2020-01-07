@@ -29,6 +29,6 @@ public class DailyAverageHandler {
 	}
 	
 	private void insertDailyAverageToDatabase(StatusModel average) {
-		dbConnector.addMeasurementsToDailyTable();
+		dbConnector.addMeasurementsToDailyTable(average);
 	}
 }

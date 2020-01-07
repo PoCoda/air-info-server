@@ -1,23 +1,20 @@
 package com.tondi.airinfoserver;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.*;
-import org.springframework.boot.autoconfigure.*;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tondi.airinfoserver.connectors.AirlyConnector;
-import com.tondi.airinfoserver.db.DbConnector;
-import com.tondi.airinfoserver.model.ResponseModel;
-import com.tondi.airinfoserver.model.ResponseModelBuilder;
 import com.tondi.airinfoserver.model.status.StatusModel;
 import com.tondi.airinfoserver.response.StatusModelResponse;
 import com.tondi.airinfoserver.response.StreakResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @EnableAutoConfiguration
@@ -36,22 +33,26 @@ public class AirInfoController {
         return this.serialize(response);
     }
     
-    @RequestMapping(value = "/streak", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    String streak() {
-    	
-    	// TODO add conditional based on matching norms or extract to two endpoinds accepting status 
-    	Boolean matchesNorms = false;
-    	Integer daysOfStreak;
-    	if(matchesNorms)
-    		daysOfStreak = pollutionAnalyzer.getDaysOfMatchingNormsStreak();
-    	else 
-    		daysOfStreak = pollutionAnalyzer.getDaysOfExceedingNormsStreak();
+    @RequestMapping(value = "/streak-matching", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    String streakMatching() {
+    	Integer daysOfStreak = pollutionAnalyzer.getDaysOfMatchingNormsStreak();
     	
     	StreakResponse response = new StreakResponse();
     	response.setDays(daysOfStreak);
     	
     	return this.serialize(response);  
 	}
+    
+    @RequestMapping(value = "/streak-exceeding", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    String streakExceeding() {
+    	Integer daysOfStreak = pollutionAnalyzer.getDaysOfExceedingNormsStreak();
+    	
+    	StreakResponse response = new StreakResponse();
+    	response.setDays(daysOfStreak);
+    	
+    	return this.serialize(response);  
+	}
+	
     
 //    @RequestMapping(value = "/best-worst-since", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 //    String bestWorstSince() {

@@ -21,20 +21,26 @@ public class DbConnector {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	private static final Logger log = LoggerFactory.getLogger(DbConnector.class);
-
-	public void addMeasurementsToDailyTable() {
-		// given measurement
-		// insert to measurements
-
+	
+	public void createDailyMeasurementsTable() {
 		log.info("Creating tables");
-//
-
-		System.out.println(jdbcTemplate);
+//		System.out.println(jdbcTemplate);
 		jdbcTemplate.execute("DROP TABLE day_measurements IF EXISTS");
 		jdbcTemplate.execute("CREATE TABLE day_measurements (" + "id SERIAL, pm10 VARCHAR(255), pm25 VARCHAR(255))");
 
-		jdbcTemplate.update("INSERT INTO day_measurements (pm10, pm25) VALUES (?, ?)", "120", "130");
-//		
+	}
+
+	public void addMeasurementsToDailyTable(StatusModel model) {
+		// given measurement
+		// insert to measurements
+		createDailyMeasurementsTable();
+
+//		jdbcTemplate.update("INSERT INTO day_measurements (pm10, pm25) VALUES (?, ?)", model.getPm10().getValue(), model.getPm25().getValue());
+		jdbcTemplate.update("INSERT INTO day_measurements (pm10, pm25) VALUES (?, ?)", "40", "50");
+		jdbcTemplate.update("INSERT INTO day_measurements (pm10, pm25) VALUES (?, ?)", "30", "20");
+		jdbcTemplate.update("INSERT INTO day_measurements (pm10, pm25) VALUES (?, ?)", "50", "32");
+
+		
 //		jdbcTemplate.query("SELECT * FROM day_measurements", (result) -> {
 //			System.out.println(result);
 //		});
@@ -59,7 +65,7 @@ public class DbConnector {
 
 	public StatusModel getAverageStatusFor(LocalDateTime dateTime) {
 		if (dateTime.isAfter(LocalDateTime.now())) {
-			return new StatusModel();
+			return new StatusModel(); // TODO throw?
 		}
 
 		jdbcTemplate.query("SELECT * FROM day_measurements", (result) -> {
