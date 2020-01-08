@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.datetime.DateFormatter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.stereotype.Service;
 
 import com.tondi.airinfoserver.PollutionType;
@@ -23,6 +24,8 @@ import com.tondi.airinfoserver.model.status.PM.PollutionModel;
 @Service
 public class DbConnector {
 
+//	JdbcTemplate jdbcTemplate = new JdbcTemplate(new SingleConnectionDataSource("jdbc:mysql://localhost:3306", "root", "", false));
+	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	private static final Logger log = LoggerFactory.getLogger(DbConnector.class);
@@ -30,7 +33,8 @@ public class DbConnector {
 	public void createDailyMeasurementsTable() {
 		log.info("Creating tables");
 //		System.out.println(jdbcTemplate);
-		jdbcTemplate.execute("DROP TABLE daily_measurements IF EXISTS");
+//		jdbcTemplate.execute("CREATE DATABASE IF NOT EXISTS db_air_info"); // create 
+		jdbcTemplate.execute("DROP TABLE IF EXISTS daily_measurements");
 		jdbcTemplate.execute("CREATE TABLE daily_measurements (" + "id SERIAL, date DATE, pm10 FLOAT, pm25 FLOAT)");
 
 	}
@@ -44,19 +48,10 @@ public class DbConnector {
 
 //		jdbcTemplate.update("INSERT INTO daily_measurements (pm10, pm25) VALUES (?, ?)", model.getPm10().getValue(), model.getPm25().getValue());
 		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow, "40", "50");
-		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow.plusDays(1), "30", "20");
-		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow.plusDays(2), "50", "32");
+		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow.minusDays(1), "30", "20");
+		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow.minusDays(2), "50", "32"); // adds |  3 | 2020-01-09 |   50 |   32 |
 
-		
-//		jdbcTemplate.query("SELECT * FROM daily_measurements", (result) -> {
-//			System.out.println(result);
-//		});
-//
-//		// Split up the array of whole names into an array of first/last names
-//		List<String[]> splitUpNames = Arrays.asList("John Woo", "Jeff Dean", "Josh Bloch", "Josh Long").stream()
-//				.map(name -> name.split(" "))
-//				.collect(Collectors.toList());
-//
+
 //		// Use a Java 8 stream to print out each tuple of the list
 //		splitUpNames.forEach(name -> log.info(String.format("Inserting customer record for %s %s", name[0], name[1])));
 //

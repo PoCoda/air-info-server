@@ -22,8 +22,7 @@ public class PollutionAnalyzer {
 	// TODO check if it works well. Maybe some unit tests?
 	public Integer getDaysOfExceedingNormsStreak() {
 		LocalDate day = LocalDate.now();
-		Integer daysStreak = 0;
-//		System.out.println(dbConnector.getAverageStatusFor(today).getMatchesNorms());
+		Integer daysStreak = 0;//		System.out.println(dbConnector.getAverageStatusFor(today).getMatchesNorms());
 		
 		StatusModel queryResult = dbConnector.getAverageStatusFor(day);
 		while(queryResult != null && !queryResult.getMatchesNorms()) {
