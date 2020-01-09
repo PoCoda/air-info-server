@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tondi.airinfoserver.connectors.AirlyConnector;
 import com.tondi.airinfoserver.model.status.StatusModel;
 import com.tondi.airinfoserver.response.StatusModelResponse;
-import com.tondi.airinfoserver.response.StreakResponse;
+import com.tondi.airinfoserver.response.DaysResponse;
 
 @RestController
 @EnableAutoConfiguration
@@ -35,9 +35,9 @@ public class AirInfoController {
     
     @RequestMapping(value = "/streak-matching", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     String streakMatching() {
-    	Integer daysOfStreak = pollutionAnalyzer.getDaysOfMatchingNormsStreak();
+    	Integer daysOfStreak = pollutionAnalyzer.getDaysMatchingNormsStreak();
     	
-    	StreakResponse response = new StreakResponse();
+    	DaysResponse response = new DaysResponse();
     	response.setDays(daysOfStreak);
     	
     	return this.serialize(response);  
@@ -45,20 +45,35 @@ public class AirInfoController {
     
     @RequestMapping(value = "/streak-exceeding", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     String streakExceeding() {
-    	Integer daysOfStreak = pollutionAnalyzer.getDaysOfExceedingNormsStreak();
+    	Integer daysOfStreak = pollutionAnalyzer.getDaysExceedingNormsStreak();
     	
-    	StreakResponse response = new StreakResponse();
+    	DaysResponse response = new DaysResponse();
     	response.setDays(daysOfStreak);
     	
     	return this.serialize(response);  
 	}
 	
     
-//    @RequestMapping(value = "/best-worst-since", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    String bestWorstSince() {
-//    	return null;
-//    }
-//    
+    @RequestMapping(value = "/best-since", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    String bestSince() {
+    	Integer sinceDays = pollutionAnalyzer.getBestSinceDays();
+    	
+    	DaysResponse response = new DaysResponse();
+    	response.setDays(sinceDays);
+    	
+    	return this.serialize(response);
+	}
+    
+    @RequestMapping(value = "/worst-since", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    String worstSince() {
+    	Integer sinceDays = pollutionAnalyzer.getWorstSinceDays();
+    	
+    	DaysResponse response = new DaysResponse();
+    	response.setDays(sinceDays);
+    	
+    	return this.serialize(response); 
+	}
+    
 //    @RequestMapping(value = "/worst-district", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 //    String worstDistrict() {
 //    	return null;

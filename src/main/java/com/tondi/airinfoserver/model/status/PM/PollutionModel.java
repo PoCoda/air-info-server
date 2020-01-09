@@ -42,4 +42,5 @@ public class PollutionModel implements Serializable {
 		Double norm = PollutionNorm.getNormValueOfType(pm.getType());
 		return pm.getValue() * 100 / norm;
 	}
+	
 }

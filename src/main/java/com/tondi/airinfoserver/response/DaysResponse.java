@@ -1,6 +1,6 @@
 package com.tondi.airinfoserver.response;
 
-public class StreakResponse {
+public class DaysResponse {
 	private Integer days;
 
 	public Integer getDays() {

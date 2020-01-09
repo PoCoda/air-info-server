@@ -32,7 +32,6 @@ public class DbConnector {
 	
 	public void createDailyMeasurementsTable() {
 		log.info("Creating tables");
-//		System.out.println(jdbcTemplate);
 //		jdbcTemplate.execute("CREATE DATABASE IF NOT EXISTS db_air_info"); // create 
 		jdbcTemplate.execute("DROP TABLE IF EXISTS daily_measurements");
 		jdbcTemplate.execute("CREATE TABLE daily_measurements (" + "id SERIAL, date DATE, pm10 FLOAT, pm25 FLOAT)");
@@ -44,28 +43,22 @@ public class DbConnector {
 		createDailyMeasurementsTable();
 		
 		LocalDate localNow = LocalDate.now();
-		System.out.println(localNow);
+		String today = localNow.toString();
+		String yesterday = localNow.minusDays(1).toString();
+		String twoDaysAgo = localNow.minusDays(2).toString();
+		String threeDaysAgo = localNow.minusDays(3).toString();
+
+//		System.out.println(localNow);
+
 
 //		jdbcTemplate.update("INSERT INTO daily_measurements (pm10, pm25) VALUES (?, ?)", model.getPm10().getValue(), model.getPm25().getValue());
-		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow, "40", "50");
-		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow.minusDays(1), "30", "20");
-		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow.minusDays(2), "50", "32"); // adds |  3 | 2020-01-09 |   50 |   32 |
-
-
-//		// Use a Java 8 stream to print out each tuple of the list
-//		splitUpNames.forEach(name -> log.info(String.format("Inserting customer record for %s %s", name[0], name[1])));
-//
-//		// Uses JdbcTemplate's batchUpdate operation to bulk load data
-//		jdbcTemplate.batchUpdate("INSERT INTO customers(first_name, last_name) VALUES (?,?)", splitUpNames);
-//
-//		log.info("Querying for customer records where first_name = 'Josh':");
-//		jdbcTemplate.query(
-//				"SELECT id, first_name, last_name FROM customers WHERE first_name = ?", new Object[] { "Josh" },
-//				(rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
-//		).forEach(customer -> log.info(customer.toString()));
+		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", today, "100", "100");
+		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", yesterday, "40", "60");
+		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", twoDaysAgo, "50", "30"); // adds |  3 | 2020-01-09 |   50 |   32 |
+		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", threeDaysAgo, "40", "12"); // adds |  3 | 2020-01-09 |   50 |   32 |
 	}
 
-	public StatusModel getAverageStatusFor(LocalDate date) throws IllegalArgumentException {
+	public StatusModel getAverageStatusForDay(LocalDate date) throws IllegalArgumentException {
 		if (date.isAfter(LocalDate.now())) {
 			throw new IllegalArgumentException("Historical date " + date + "cannot be in future");
 		}

@@ -37,6 +37,10 @@ public class StatusModel implements Cloneable {
 	public PollutionModel getPm25() {
 		return pm25;
 	}
+	
+	public Double calculateHarmFactor() {
+		return (this.getPm10().getValue() + 2 * this.getPm25().getValue()) / 3;
+	}
 
 	public static StatusModel getAveragedStatus(List<StatusModel> statusList) {
 
