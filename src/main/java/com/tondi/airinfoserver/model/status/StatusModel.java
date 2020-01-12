@@ -1,10 +1,11 @@
 package com.tondi.airinfoserver.model.status;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.tondi.airinfoserver.model.status.PM.PollutionModel;
 
-public class StatusModel implements Cloneable {
+public class StatusModel implements Cloneable, Serializable {
 
 	private PollutionModel pm10;
 	private PollutionModel pm25;
@@ -40,6 +41,10 @@ public class StatusModel implements Cloneable {
 	
 	public Double calculateHarmFactor() {
 		return (this.getPm10().getValue() + 2 * this.getPm25().getValue()) / 3;
+	}
+	
+	public Double calculateHarmFactorPercentage() {
+		return (this.getPm10().getPercentage()) + 2 * this.getPm25().getPercentage() / 3;
 	}
 
 	public static StatusModel getAveragedStatus(List<StatusModel> statusList) {

@@ -1,6 +1,8 @@
 package com.tondi.airinfoserver.response;
 
-public class DaysResponse {
+import java.io.Serializable;
+
+public class DaysResponse implements Serializable {
 	private Integer days;
 
 	public Integer getDays() {

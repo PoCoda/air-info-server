@@ -1,11 +1,16 @@
 package com.tondi.airinfoserver;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
+import java.util.ArrayList;
+import java.util.DoubleSummaryStatistics;
+import java.util.IntSummaryStatistics;
+import java.util.List;
+import java.util.Locale;
 import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
-
-import javax.el.LambdaExpression;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,8 +88,34 @@ public class PollutionAnalyzer {
 		return daysSince;
 	}
 	
-	public Double getLastWeekAverage() {
-		// TODO add to AirInfoController
-		return 138.0;
+	// TODO add to AirInfoController
+	// TODO check if works
+	public Double getThisWeekAverage() {
+		List<LocalDate> thisWeek = getDaysOfThisWeek();
+
+		DoubleSummaryStatistics summary = thisWeek.stream()
+			.map((LocalDate date) -> dbConnector.getAverageStatusForDay(date))
+			.mapToDouble((StatusModel dayAverage) -> dayAverage.calculateHarmFactorPercentage())
+			.summaryStatistics();
+		
+		return summary.getAverage();
+	}
+	
+	// TODO check if works
+	private List<LocalDate> getDaysOfThisWeek() {
+		ArrayList<LocalDate> week = new ArrayList<LocalDate>(); 
+		LocalDate day = LocalDate.now();
+
+		DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
+		LocalDate startOfCurrentWeek = day.with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+		
+		Integer days = 1;
+		while(day.isAfter(startOfCurrentWeek) || day.equals(startOfCurrentWeek)) {
+			week.add(day);
+			day = day.minusDays(days);
+			days++;
+		}
+		
+		return week;
 	}
 }

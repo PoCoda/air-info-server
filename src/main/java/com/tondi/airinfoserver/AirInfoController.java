@@ -15,6 +15,7 @@ import com.tondi.airinfoserver.connectors.AirlyConnector;
 import com.tondi.airinfoserver.model.status.StatusModel;
 import com.tondi.airinfoserver.response.StatusModelResponse;
 import com.tondi.airinfoserver.response.DaysResponse;
+import com.tondi.airinfoserver.response.PercentageResponse;
 
 @RestController
 @EnableAutoConfiguration
@@ -79,10 +80,15 @@ public class AirInfoController {
 //    	return null;
 //    }
 //
-//    @RequestMapping(value = "/last-week-average", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    String lastWeekAverage() {
-//    	return null;
-//    }
+    @RequestMapping(value = "/last-week-average", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    String lastWeekAverage() {
+    	Double average = pollutionAnalyzer.getThisWeekAverage();
+    	
+    	PercentageResponse response = new PercentageResponse();
+    	response.setPercentage(average);
+    	
+    	return this.serialize(response); 
+    }
 //    
 //    @RequestMapping(value = "/last-year", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 //    String lastYear() {

@@ -1,5 +1,8 @@
 package com.tondi.airinfoserver;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,8 +14,15 @@ import com.tondi.airinfoserver.daily_executor.DailyExecutor;
 @SpringBootApplication
 public class AirInfoServerApplication {
 	
+	private static void doStuff() {
+		ArrayList<String> list = (ArrayList<String>) Arrays.asList(new String[]{"one", "two", "three", "one"});
+		
+	}
+	
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(AirInfoServerApplication.class, args);
         context.getBean(DailyExecutor.class).startExecutionAt(0, 0, 0); // at each midnight
+        
+        doStuff();
 	}
 }
