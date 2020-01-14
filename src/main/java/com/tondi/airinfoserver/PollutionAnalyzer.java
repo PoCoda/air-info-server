@@ -9,6 +9,7 @@ import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -60,14 +61,14 @@ public class PollutionAnalyzer {
 	}
 
 	private Integer getDaysFulfillingCondition(BiFunction<Double, Double, Boolean> predicate) {
+		
 		LocalDate day = LocalDate.now();
 		Integer daysSince = 1;
 
 		StatusModel queryResult = dbConnector.getAverageStatusForDay(day);
-		Double harmFactor = queryResult.calculateHarmFactor();
+		Double harmFactor;
 		while (queryResult != null) {
-			System.out.println(harmFactor);
-			System.out.println(day.minusDays(daysSince));
+			harmFactor = queryResult.calculateHarmFactor();
 
 			queryResult = dbConnector.getAverageStatusForDay(day.minusDays(daysSince));
 			Double newHarmFactor = Double.MAX_VALUE;
@@ -87,35 +88,63 @@ public class PollutionAnalyzer {
 
 		return daysSince;
 	}
-	
-	// TODO add to AirInfoController
-	// TODO check if works
-	public Double getThisWeekAverage() {
-		List<LocalDate> thisWeek = getDaysOfThisWeek();
 
-		DoubleSummaryStatistics summary = thisWeek.stream()
-			.map((LocalDate date) -> dbConnector.getAverageStatusForDay(date))
-			.mapToDouble((StatusModel dayAverage) -> dayAverage.calculateHarmFactorPercentage())
-			.summaryStatistics();
-		
-		return summary.getAverage();
+	public Double getLastWeekAverage() {
+		List<LocalDate> lastWeek = getDaysOfLastWeek();
+		return getAverageOfDays(lastWeek); 
 	}
 	
-	// TODO check if works
+	public Double getThisWeekAverage() {
+		List<LocalDate> thisWeek = getDaysOfThisWeek();
+		return getAverageOfDays(thisWeek);
+	}
+	
+	private Double getAverageOfDays(List<LocalDate> days) {
+		DoubleSummaryStatistics summary = days.stream()
+				.map((LocalDate date) -> dbConnector.getAverageStatusForDay(date))
+				.filter(Objects::nonNull)
+				.mapToDouble((StatusModel dayAverage) -> dayAverage.calculateHarmFactorPercentage())
+				.summaryStatistics();
+
+		return summary.getAverage();
+	}
+
 	private List<LocalDate> getDaysOfThisWeek() {
-		ArrayList<LocalDate> week = new ArrayList<LocalDate>(); 
+		ArrayList<LocalDate> week = new ArrayList<LocalDate>();
 		LocalDate day = LocalDate.now();
 
 		DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
 		LocalDate startOfCurrentWeek = day.with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
-		
-		Integer days = 1;
-		while(day.isAfter(startOfCurrentWeek) || day.equals(startOfCurrentWeek)) {
+
+		while (day.isAfter(startOfCurrentWeek) || day.equals(startOfCurrentWeek)) {
 			week.add(day);
-			day = day.minusDays(days);
-			days++;
+			day = day.minusDays(1);
 		}
-		
+
+		return week;
+	} 
+
+	private List<LocalDate> getDaysOfLastWeek() {
+		ArrayList<LocalDate> week = new ArrayList<LocalDate>();
+		LocalDate now = LocalDate.now();
+
+		DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
+		LocalDate startOfCurrentWeek = now.with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+		LocalDate startOfLastWeek = startOfCurrentWeek.minusDays(7);
+		LocalDate day = startOfLastWeek;
+
+		while ((day.isAfter(startOfLastWeek) || day.equals(startOfLastWeek))
+				&& (day.isBefore(startOfCurrentWeek))) {
+			week.add(day);
+			day = day.plusDays(1);
+		}
+
 		return week;
 	}
+	
+//	private List<LocalDate> getDaysBetween(LocalDate start, LocalDate end) {
+//		return new ArrayList();
+//	}
+
+//	private getDaysAfter() {}
 }

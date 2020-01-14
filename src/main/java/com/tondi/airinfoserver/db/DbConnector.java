@@ -1,6 +1,7 @@
 package com.tondi.airinfoserver.db;
 
 import java.util.List;
+import java.util.Random;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
@@ -44,18 +45,22 @@ public class DbConnector {
 		
 		LocalDate localNow = LocalDate.now();
 		String today = localNow.toString();
-		String yesterday = localNow.minusDays(1).toString();
-		String twoDaysAgo = localNow.minusDays(2).toString();
-		String threeDaysAgo = localNow.minusDays(3).toString();
+//		String yesterday = localNow.minusDays(1).toString();
+//		String twoDaysAgo = localNow.minusDays(2).toString();
+//		String threeDaysAgo = localNow.minusDays(3).toString();
 
 //		System.out.println(localNow);
 
 
 //		jdbcTemplate.update("INSERT INTO daily_measurements (pm10, pm25) VALUES (?, ?)", model.getPm10().getValue(), model.getPm25().getValue());
-		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", today, "100", "100");
-		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", yesterday, "40", "60");
-		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", twoDaysAgo, "50", "30"); // adds |  3 | 2020-01-09 |   50 |   32 |
-		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", threeDaysAgo, "40", "12"); // adds |  3 | 2020-01-09 |   50 |   32 |
+//		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", today, "100", "100");
+//		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", yesterday, "40", "60");
+//		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", twoDaysAgo, "50", "30"); // adds |  3 | 2020-01-09 |   50 |   32 |
+//		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", threeDaysAgo, "40", "12"); // adds |  3 | 2020-01-09 |   50 |   32 |
+		
+		for(int i = 0; i < 14; i++) {
+			jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow.minusDays(i).toString(), Math.random() * 100, Math.random() * 50);
+		}
 	}
 
 	public StatusModel getAverageStatusForDay(LocalDate date) throws IllegalArgumentException {

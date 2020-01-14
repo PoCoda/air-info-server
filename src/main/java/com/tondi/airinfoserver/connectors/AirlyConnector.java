@@ -108,18 +108,7 @@ public class AirlyConnector implements PollutionServiceConnector {
 
 		return status;
 	}
-
-//	private ParticlePollutionModel appendValuesToParticlePollutionModel(ParticlePollutionModel model, Iterator<JsonNode> valuesIterator) {
-//		while (valuesIterator.hasNext()) {
-//			JsonNode currentValue = valuesIterator.next();
-//			if (currentValue.get("name").asText().equals(model.getName())) { // TODO getAirlyName(model.getname())
-//				model.setValue(currentValue.get("value").asDouble());
-//				continue;
-//			}
-//		}
-//		return model;
-//	}
-
+	
 	public ArrayList<StatusModel> getHourlyPollutionModels(String response) {
 		final JsonNode responseNode;
 
