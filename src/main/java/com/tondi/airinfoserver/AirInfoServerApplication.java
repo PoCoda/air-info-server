@@ -1,14 +1,9 @@
 package com.tondi.airinfoserver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.tondi.airinfoserver.daily_executor.DailyAverageHandler;
 import com.tondi.airinfoserver.daily_executor.DailyExecutor;
 
 @SpringBootApplication

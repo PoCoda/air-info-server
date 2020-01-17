@@ -27,11 +27,15 @@ public class PollutionModel implements Serializable {
 	}
 	
 	public Double getPercentage() {
+		if(this.percentage == null) {
+			this.setPercentage(PollutionModel.calculatePercentage(this));
+		}
 		return this.percentage;
 	}
 	
 	public void setValue(Double value) {
 		this.value = value;
+		this.setPercentage(PollutionModel.calculatePercentage(this));
 	}
 
 	public void setPercentage(Double percentage) {
@@ -40,6 +44,8 @@ public class PollutionModel implements Serializable {
 	
 	public static Double calculatePercentage(PollutionModel pm) {
 		Double norm = PollutionNorm.getNormValueOfType(pm.getType());
+		if(pm.getValue() == null) 
+			return 0.0;
 		return pm.getValue() * 100 / norm;
 	}
 	

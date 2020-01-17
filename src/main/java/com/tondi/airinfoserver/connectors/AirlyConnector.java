@@ -56,6 +56,7 @@ public class AirlyConnector implements PollutionServiceConnector {
 		return this.getHourlyPollutionModels(responseBody);
 	}
 
+	// TODO check if empty model & return NullStatusModel
 	private StatusModel buildCurrentStatusModel(String response) {
 		PollutionModel pm10status = new PollutionModel(PollutionType.PM10);
 		PollutionModel pm25status = new PollutionModel(PollutionType.PM25);

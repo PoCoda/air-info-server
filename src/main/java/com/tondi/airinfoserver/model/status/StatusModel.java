@@ -44,7 +44,13 @@ public class StatusModel implements Cloneable, Serializable {
 	}
 	
 	public Double calculateHarmFactorPercentage() {
-		return (this.getPm10().getPercentage()) + 2 * this.getPm25().getPercentage() / 3;
+		return (this.getPm10().getPercentage() + 2 * this.getPm25().getPercentage()) / 3;
+	}
+	
+	public Boolean hasAnyEmptyValue() {
+		if(this.getPm10().getValue() == null || this.getPm25().getValue() == null)
+			return true;
+		return false;
 	}
 
 	public static StatusModel getAveragedStatus(List<StatusModel> statusList) {
@@ -72,8 +78,8 @@ public class StatusModel implements Cloneable, Serializable {
 	}
 	
 	public static Boolean calculateMatchesNorms(StatusModel status) {
-		if(status.getPm10().getPercentage() == null || status.getPm25().getPercentage() == null) {
-			throw new IllegalArgumentException("Cannot calculate percentage - Passed object has some PollutionModel's percentage set to null");
+		if(status.hasAnyEmptyValue()) {
+			return true;
 		}
 		
 		if (status.getPm10().getPercentage() > 100 || status.getPm25().getPercentage() > 100) {

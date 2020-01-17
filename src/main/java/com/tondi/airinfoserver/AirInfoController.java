@@ -7,7 +7,6 @@ import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,11 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tondi.airinfoserver.connectors.AirlyConnector;
 import com.tondi.airinfoserver.model.status.StatusModel;
 import com.tondi.airinfoserver.response.StatusModelResponse;
+import com.tondi.airinfoserver.response.WorstDistrictResponse;
 import com.tondi.airinfoserver.response.DaysResponse;
 import com.tondi.airinfoserver.response.PercentageResponse;
 
 @RestController
-@EnableAutoConfiguration
 public class AirInfoController {
 	@Autowired
 	private AirlyConnector airlyConnector;
@@ -39,6 +38,7 @@ public class AirInfoController {
 	private final String API_WORST_SINCE = "/worst-since";
 	private final String API_THIS_WEEK_AVERAGE = "/this-week-average";
 	private final String API_LAST_WEEK_AVERAGE = "/last-week-average";
+	private final String API_WORST_DISTRICT = "/worst-district";
 
 	@RequestMapping(value = API_CURRENT, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	String current() {
@@ -65,11 +65,11 @@ public class AirInfoController {
 		return this.serialize(this.getWorstSince());
 	}
 
-//    @RequestMapping(value = "/worst-district", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    String worstDistrict() {
-//    	return null;
-//    }
-//
+    @RequestMapping(value = "/worst-district", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    String worstDistrict() {	
+    	return this.serialize(this.getWorstDistrict());
+    }
+
 
 	@RequestMapping(value = API_THIS_WEEK_AVERAGE, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	String thisWeekAverage() {
@@ -92,6 +92,7 @@ public class AirInfoController {
 					District.Old_Town.getLng());
 			StatusModelResponse response = new StatusModelResponse(currentStatus);
 			this.lastResponses.put(API_CURRENT, response);
+			System.out.println("execute " + response);
 			return response;
 		} catch (HttpClientErrorException.TooManyRequests e) {
 			return this.lastResponses.get(API_CURRENT);
@@ -179,6 +180,30 @@ public class AirInfoController {
 			return response;
 		} catch (HttpClientErrorException.TooManyRequests e) {
 			return this.lastResponses.get(API_LAST_WEEK_AVERAGE);
+		}
+	}
+	
+	private Serializable getWorstDistrict() {
+		try {
+			District worstDistrict = District.Old_Town; 
+	    	Double worstPercentage = 0.0;
+	    	for(District d : District.values()) {
+	    		StatusModel sm = airlyConnector.getCurrentPollutionForLatLng(d.getLat(), d.getLng());
+	    		Double districtPercentage = sm.calculateHarmFactorPercentage();
+	    		if(districtPercentage > worstPercentage) {
+	    			worstPercentage = districtPercentage;
+	    			worstDistrict = d;
+	    		}
+	    	}
+	    	
+	    	WorstDistrictResponse response = new WorstDistrictResponse();
+	    	response.setName(worstDistrict.getName());
+	    	response.setPercentage(worstPercentage);
+			
+			this.lastResponses.put(API_WORST_DISTRICT, response);
+			return response;
+		} catch (HttpClientErrorException.TooManyRequests e) {
+			return this.lastResponses.get(API_WORST_DISTRICT);
 		}
 	}
 	
