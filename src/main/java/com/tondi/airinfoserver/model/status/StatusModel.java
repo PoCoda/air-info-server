@@ -40,10 +40,14 @@ public class StatusModel implements Cloneable, Serializable {
 	}
 	
 	public Double calculateHarmFactor() {
+		if(this.hasAnyEmptyValue()) return null;
+		
 		return (this.getPm10().getValue() + 2 * this.getPm25().getValue()) / 3;
 	}
 	
 	public Double calculateHarmFactorPercentage() {
+		if(this.hasAnyEmptyValue()) return null;
+
 		return (this.getPm10().getPercentage() + 2 * this.getPm25().getPercentage()) / 3;
 	}
 	
@@ -60,10 +64,12 @@ public class StatusModel implements Cloneable, Serializable {
 			average = (StatusModel) statusList.get(0).clone();
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
-			return new StatusModel();
+			return null;
 		}
 
 		for (StatusModel model : statusList) {
+			if(model.hasAnyEmptyValue()) continue; // TODO throw instead of allowing empty models
+			
 			PollutionModel hourlyPm10 = model.getPm10();
 			Double newPm10Value = (average.getPm10().getValue() + hourlyPm10.getValue()) / 2;
 			average.getPm10().setValue(newPm10Value);
@@ -73,6 +79,7 @@ public class StatusModel implements Cloneable, Serializable {
 			average.getPm25().setValue(newPm25Value);
 		}
 
+//		System.out.println(average.calculateHarmFactor());
 		return average;
 
 	}

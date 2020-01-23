@@ -11,6 +11,6 @@ public class AirInfoServerApplication {
 	
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(AirInfoServerApplication.class, args);
-        context.getBean(DailyExecutor.class).startExecutionAt(0, 0, 0); // at each midnight
+        context.getBean(DailyExecutor.class).startExecutionAt(23, 59, 0); // at each midnight
 	}
 }

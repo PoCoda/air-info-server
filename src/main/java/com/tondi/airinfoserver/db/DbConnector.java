@@ -31,36 +31,34 @@ public class DbConnector {
 	JdbcTemplate jdbcTemplate;
 	private static final Logger log = LoggerFactory.getLogger(DbConnector.class);
 	
-	public void createDailyMeasurementsTable() {
-		log.info("Creating tables");
+//	public void addRandomValuesToDailyMeasurementsTable() {
+//		log.info("Creating tables");
 //		jdbcTemplate.execute("CREATE DATABASE IF NOT EXISTS db_air_info"); // create 
-		jdbcTemplate.execute("DROP TABLE IF EXISTS daily_measurements");
-		jdbcTemplate.execute("CREATE TABLE daily_measurements (" + "id SERIAL, date DATE, pm10 FLOAT, pm25 FLOAT)");
-
-	}
-
-	public void addStatusToDailyTable(StatusModel model) {
-
-		createDailyMeasurementsTable();
-		
-		LocalDate localNow = LocalDate.now();
-		String today = localNow.toString();
+//		jdbcTemplate.execute("DROP TABLE IF EXISTS daily_measurements");
+//		jdbcTemplate.execute("CREATE TABLE daily_measurements (" + "id SERIAL, date DATE, pm10 FLOAT, pm25 FLOAT)");
+//
+//		LocalDate localNow = LocalDate.now();
+//		String today = localNow.toString();
 //		String yesterday = localNow.minusDays(1).toString();
 //		String twoDaysAgo = localNow.minusDays(2).toString();
 //		String threeDaysAgo = localNow.minusDays(3).toString();
-
+//
 //		System.out.println(localNow);
+//
+//		for(int i = 0; i < 14; i++) {
+//			jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow.minusDays(i).toString(), Math.random() * 100, Math.random() * 50);
+//		}
+//	}
 
+	public void addStatusToDailyTable(StatusModel model) {
 
-//		jdbcTemplate.update("INSERT INTO daily_measurements (pm10, pm25) VALUES (?, ?)", model.getPm10().getValue(), model.getPm25().getValue());
-//		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", today, "100", "100");
-//		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", yesterday, "40", "60");
-//		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", twoDaysAgo, "50", "30"); // adds |  3 | 2020-01-09 |   50 |   32 |
-//		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", threeDaysAgo, "40", "12"); // adds |  3 | 2020-01-09 |   50 |   32 |
+//		addRandomValuesToDailyMeasurementsTable();
 		
-		for(int i = 0; i < 14; i++) {
-			jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", localNow.minusDays(i).toString(), Math.random() * 100, Math.random() * 50);
-		}
+		LocalDate localNow = LocalDate.now();
+		String today = localNow.toString();
+		
+		jdbcTemplate.update("INSERT INTO daily_measurements (date, pm10, pm25) VALUES (?, ?, ?)", today, model.getPm10().getValue(), model.getPm25().getValue());
+		log.debug("Inserted into daily_measurements" + "PM10" + model.getPm10().getValue() + ", " + "PM25" + model.getPm25().getValue());
 	}
 
 	public StatusModel getAverageStatusForDay(LocalDate date) throws IllegalArgumentException {

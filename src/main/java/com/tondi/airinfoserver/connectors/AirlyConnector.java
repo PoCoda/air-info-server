@@ -1,8 +1,10 @@
 package com.tondi.airinfoserver.connectors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tondi.airinfoserver.District;
 import com.tondi.airinfoserver.PollutionType;
 import com.tondi.airinfoserver.model.status.StatusModel;
 import com.tondi.airinfoserver.model.status.PM.PollutionModel;
@@ -48,6 +51,18 @@ public class AirlyConnector implements PollutionServiceConnector {
 		final String url = "/measurements/point?lat=" + lat.toString() + "&" + "lng=" + lng.toString();
 		final String responseBody = this.get(url);
 		return this.buildCurrentStatusModel(responseBody);
+	}
+	
+	public StatusModel getHistoricalAveragePollution() {
+		ArrayList<StatusModel> districtAverages = new ArrayList<>();
+    	for(District d : District.values()) {
+    		List<StatusModel> historical = this.getHistoricalPollutionForLatLng(d.getLat(), d.getLng());
+    		districtAverages.add(StatusModel.getAveragedStatus(historical));
+    	}
+    	
+//    	System.out.println(StatusModel.getAveragedStatus(districtAverages).calculateHarmFactorPercentage());    		
+    	
+		return StatusModel.getAveragedStatus(districtAverages);
 	}
 	
 	public List<StatusModel> getHistoricalPollutionForLatLng(Double lat, Double lng) {

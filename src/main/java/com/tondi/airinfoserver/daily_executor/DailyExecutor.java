@@ -66,8 +66,8 @@ public class DailyExecutor {
 			zonedNextTarget = zonedNextTarget.plusDays(1);
 
 		Duration duration = Duration.between(zonedNow, zonedNextTarget);
-//        return duration.getSeconds();
-		return 1;
+        return duration.getSeconds();
+//		return 1;
 	}
 
 	public void stop() {
