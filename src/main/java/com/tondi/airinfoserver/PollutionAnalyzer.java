@@ -33,13 +33,13 @@ public class PollutionAnalyzer {
 	}
 
 	private Integer calculateDaysStreakOf(Function<StatusModel, Boolean> predicate) {
-		LocalDate day = LocalDate.now();
+		LocalDate yesterday = LocalDate.now().minusDays(1);
 		Integer daysStreak = 0;
 
-		StatusModel queryResult = dbConnector.getAverageStatusForDay(day);
+		StatusModel queryResult = dbConnector.getAverageStatusForDay(yesterday);
 		while (queryResult != null && predicate.apply(queryResult)) {
 			daysStreak++;
-			queryResult = dbConnector.getAverageStatusForDay(day.minusDays(daysStreak));
+			queryResult = dbConnector.getAverageStatusForDay(yesterday.minusDays(daysStreak));
 		}
 
 		return daysStreak;

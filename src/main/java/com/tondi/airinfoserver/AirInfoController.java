@@ -190,7 +190,7 @@ public class AirInfoController {
 	    	for(District d : District.values()) {
 	    		StatusModel sm = airlyConnector.getCurrentPollutionForLatLng(d.getLat(), d.getLng());
 	    		Double districtPercentage = sm.calculateHarmFactorPercentage();
-	    		if(districtPercentage > worstPercentage) {
+	    		if(districtPercentage != null && districtPercentage > worstPercentage) {
 	    			worstPercentage = districtPercentage;
 	    			worstDistrict = d;
 	    		}
