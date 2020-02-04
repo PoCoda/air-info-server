@@ -16,6 +16,7 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tondi.airinfoserver.connectors.AirlyConnector;
 import com.tondi.airinfoserver.db.DbConnector;
 import com.tondi.airinfoserver.model.status.StatusModel;
 
@@ -23,6 +24,9 @@ import com.tondi.airinfoserver.model.status.StatusModel;
 public class PollutionAnalyzer {
 	@Autowired
 	DbConnector dbConnector;
+	
+	@Autowired
+	AirlyConnector airlyConnector;
 
 	public Integer getDaysMatchingNormsStreak() {
 		return calculateDaysStreakOf((StatusModel status) -> status.getMatchesNorms());
@@ -53,11 +57,11 @@ public class PollutionAnalyzer {
 	 * @return
 	 */
 	public Integer getWorstSinceDays() {
-		return this.getDaysFulfillingCondition((Double current, Double last) -> current >= last);
+		return this.getDaysFulfillingCondition((Double first, Double second) -> first >= second);
 	}
 
 	public Integer getBestSinceDays() {
-		return this.getDaysFulfillingCondition((Double current, Double last) -> current <= last);
+		return this.getDaysFulfillingCondition((Double first, Double second) -> first <= second);
 	}
 
 	private Integer getDaysFulfillingCondition(BiFunction<Double, Double, Boolean> predicate) {
@@ -65,24 +69,23 @@ public class PollutionAnalyzer {
 		LocalDate day = LocalDate.now();
 		Integer daysSince = 1;
 
-		StatusModel queryResult = dbConnector.getAverageStatusForDay(day);
-		Double harmFactor;
-		while (queryResult != null) {
-			harmFactor = queryResult.calculateHarmFactor();
+		StatusModel todays = airlyConnector.getCurrentPollutionForLatLng(District.Old_Town.getLat(), District.Old_Town.getLng());
+		Double todaysHarmFactor = todays.calculateHarmFactor();
 
+		StatusModel queryResult = todays;
+		
+		
+		while (queryResult != null) {
 			queryResult = dbConnector.getAverageStatusForDay(day.minusDays(daysSince));
-			Double newHarmFactor = Double.MAX_VALUE;
+			Double previousHarmFactor = Double.MAX_VALUE;
 			if (queryResult != null) {
-				newHarmFactor = queryResult.calculateHarmFactor();
+				previousHarmFactor = queryResult.calculateHarmFactor();
 			}
 
-			System.out.println(newHarmFactor);
-
-			if (predicate.apply(newHarmFactor, harmFactor)) {
+			if (predicate.apply(previousHarmFactor, todaysHarmFactor)) {
 				break;
 			}
 
-			harmFactor = newHarmFactor;
 			daysSince++;
 		}
 
