@@ -1,4 +1,4 @@
-FROM tomcat:latest
-ADD target/air-info-server-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/
-EXPOSE 8080
-CMD ["catalina.sh", "run"]
+FROM openjdk:8-jdk-alpine
+VOLUME /tmp
+COPY target/air-info-server-0.0.1.war app.war
+ENTRYPOINT ["java","-jar","/app.war"]
