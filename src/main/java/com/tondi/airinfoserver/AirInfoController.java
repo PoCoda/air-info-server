@@ -25,68 +25,20 @@ import com.tondi.airinfoserver.response.PercentageResponse;
 public class AirInfoController {
 	@Autowired
 	private AirlyConnector airlyConnector;
-	@Autowired
-	private PollutionAnalyzer pollutionAnalyzer;
 	private ObjectMapper mapper = new ObjectMapper();
 
 	private HashMap<String, Serializable> lastResponses = new HashMap<>();
 
 	private final String API_CURRENT = "/current";
-	private final String API_STREAK_MATCHING = "/streak-matching";
-	private final String API_STREAK_EXCEEDING = "/streak-exceeding";
-	private final String API_BEST_SINCE = "/best-since";
-	private final String API_WORST_SINCE = "/worst-since";
-	private final String API_THIS_WEEK_AVERAGE = "/this-week-average";
-	private final String API_LAST_WEEK_AVERAGE = "/last-week-average";
-	private final String API_WORST_DISTRICT = "/worst-district";
 
 	@RequestMapping(value = API_CURRENT, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	String current() {
 		return this.serialize(this.getCurrent());
 	}
 
-	@RequestMapping(value = API_STREAK_MATCHING, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	String streakMatching() {
-		return this.serialize(this.getStreakMatching());
-	}
-
-	@RequestMapping(value = API_STREAK_EXCEEDING, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	String streakExceeding() {
-		return this.serialize(this.getStreakExceeding());
-	}
-
-	@RequestMapping(value = API_BEST_SINCE, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	String bestSince() {
-		return this.serialize(this.getBestSince());
-	}
-
-	@RequestMapping(value = API_WORST_SINCE, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	String worstSince() {
-		return this.serialize(this.getWorstSince());
-	}
-
-    @RequestMapping(value = "/worst-district", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    String worstDistrict() {	
-    	return this.serialize(this.getWorstDistrict());
-    }
-
-
-	@RequestMapping(value = API_THIS_WEEK_AVERAGE, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	String thisWeekAverage() {
-		return this.serialize(this.getThisWeekAverage());
-	}
-
-	@RequestMapping(value = API_LAST_WEEK_AVERAGE, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	String lastWeekAverage() {
-		return this.serialize(this.getLastWeekAverage());
-	}
-
-//    @RequestMapping(value = "/last-year", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    String lastYear() {
-//    	return null;
-//    }
-
 	private Serializable getCurrent() {
+		System.out.println("updated !!!!! dupa");
+
 		try {
 			StatusModel currentStatus = airlyConnector.getCurrentPollutionForLatLng(District.Old_Town.getLat(),
 					District.Old_Town.getLng());
@@ -99,114 +51,6 @@ public class AirInfoController {
 		}
 	}
 
-	private Serializable getStreakMatching() {
-		try {			
-			Integer daysOfStreak = pollutionAnalyzer.getDaysMatchingNormsStreak();
-
-			DaysResponse response = new DaysResponse();
-			response.setDays(daysOfStreak);
-
-			this.lastResponses.put(API_STREAK_MATCHING, response);
-			return response;
-		} catch (HttpClientErrorException.TooManyRequests e) {
-			return this.lastResponses.get(API_STREAK_MATCHING);
-		}
-	}
-	
-	private Serializable getStreakExceeding() {
-		try {			
-			Integer daysOfStreak = pollutionAnalyzer.getDaysExceedingNormsStreak();
-
-			DaysResponse response = new DaysResponse();
-			response.setDays(daysOfStreak);
-
-			this.lastResponses.put(API_STREAK_EXCEEDING, response);
-			return response;
-		} catch (HttpClientErrorException.TooManyRequests e) {
-			return this.lastResponses.get(API_STREAK_EXCEEDING);
-		}
-	}
-	
-	private Serializable getBestSince() {
-		try {
-			Integer sinceDays = pollutionAnalyzer.getBestSinceDays();
-
-			DaysResponse response = new DaysResponse();
-			response.setDays(sinceDays);
-
-			this.lastResponses.put(API_BEST_SINCE, response);
-			return response;
-		} catch (HttpClientErrorException.TooManyRequests e) {
-			return this.lastResponses.get(API_BEST_SINCE);
-		}
-	}
-	
-	private Serializable getWorstSince() {
-		try {
-			Integer sinceDays = pollutionAnalyzer.getWorstSinceDays();
-
-			DaysResponse response = new DaysResponse();
-			response.setDays(sinceDays);
-
-			this.lastResponses.put(API_WORST_SINCE, response);
-			return response;
-		} catch (HttpClientErrorException.TooManyRequests e) {
-			return this.lastResponses.get(API_WORST_SINCE);
-		}
-	}
-	
-	private Serializable getThisWeekAverage() {
-		try {
-			Double average = pollutionAnalyzer.getThisWeekAverage();
-
-			PercentageResponse response = new PercentageResponse();
-			response.setPercentage(average);
-			
-			this.lastResponses.put(API_THIS_WEEK_AVERAGE, response);
-			return response;
-		} catch (HttpClientErrorException.TooManyRequests e) {
-			return this.lastResponses.get(API_THIS_WEEK_AVERAGE);
-		}
-	}
-	
-	private Serializable getLastWeekAverage() {
-		try {
-			Double average = pollutionAnalyzer.getLastWeekAverage();
-
-			PercentageResponse response = new PercentageResponse();
-			response.setPercentage(average);
-			
-			this.lastResponses.put(API_LAST_WEEK_AVERAGE, response);
-			return response;
-		} catch (HttpClientErrorException.TooManyRequests e) {
-			return this.lastResponses.get(API_LAST_WEEK_AVERAGE);
-		}
-	}
-	
-	private Serializable getWorstDistrict() {
-		try {
-			District worstDistrict = District.Old_Town; 
-	    	Double worstPercentage = 0.0;
-	    	for(District d : District.values()) {
-	    		StatusModel sm = airlyConnector.getCurrentPollutionForLatLng(d.getLat(), d.getLng());
-	    		Double districtPercentage = sm.calculateHarmFactorPercentage();
-	    		if(districtPercentage != null && districtPercentage > worstPercentage) {
-	    			worstPercentage = districtPercentage;
-	    			worstDistrict = d;
-	    		}
-	    	}
-	    	
-	    	WorstDistrictResponse response = new WorstDistrictResponse();
-	    	response.setName(worstDistrict.getName());
-	    	response.setPercentage(worstPercentage);
-			
-			this.lastResponses.put(API_WORST_DISTRICT, response);
-			return response;
-		} catch (HttpClientErrorException.TooManyRequests e) {
-			return this.lastResponses.get(API_WORST_DISTRICT);
-		}
-	}
-	
 	private String serialize(Object value) {
 		try {
 			String jsonStr = mapper.writeValueAsString(value);
