@@ -1,25 +1,21 @@
 package com.tondi.airinfoserver;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tondi.airinfoserver.connectors.AirlyConnector;
+import com.tondi.airinfoserver.model.status.StatusModel;
+import com.tondi.airinfoserver.response.StatusModelResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tondi.airinfoserver.connectors.AirlyConnector;
-import com.tondi.airinfoserver.model.status.StatusModel;
-import com.tondi.airinfoserver.response.StatusModelResponse;
-import com.tondi.airinfoserver.response.WorstDistrictResponse;
-import com.tondi.airinfoserver.response.DaysResponse;
-import com.tondi.airinfoserver.response.PercentageResponse;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
 
 @RestController
 public class AirInfoController {
@@ -30,6 +26,7 @@ public class AirInfoController {
 	private HashMap<String, Serializable> lastResponses = new HashMap<>();
 
 	private final String API_CURRENT = "/current";
+	private static final Logger logger = LoggerFactory.getLogger(AirInfoController.class);
 
 	@RequestMapping(value = API_CURRENT, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	String current() {
@@ -37,13 +34,13 @@ public class AirInfoController {
 	}
 
 	private Serializable getCurrent() {
-		System.out.println("updated !!!!! dupa");
-
 		try {
 			StatusModel currentStatus = airlyConnector.getCurrentPollutionForLatLng(District.Old_Town.getLat(),
 					District.Old_Town.getLng());
 			StatusModelResponse response = new StatusModelResponse(currentStatus);
 			this.lastResponses.put(API_CURRENT, response);
+
+			logger.info("Executing air pollution fetch: " + response);
 			System.out.println("execute " + response);
 			return response;
 		} catch (HttpClientErrorException.TooManyRequests e) {
